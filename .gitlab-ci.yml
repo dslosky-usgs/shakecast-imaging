@@ -1,0 +1,39 @@
+stages:
+  - build
+  - test
+  - cleanup
+
+container:
+  stage: build
+  tags:
+    - dev
+  script:
+    - docker build . -t shakecast/imaging
+
+app-test:
+  stage: test
+  tags:
+    - dev
+  script:
+    - docker run -d --rm --name sc-imaging-app-test shakecast/imaging
+    - sleep 10
+    - docker exec sc-imaging-app-test python -m shakecastimaging.tests
+    - docker stop sc-imaging-app-test
+  
+container-test:
+  stage: test
+  tags:
+    - dev
+  script:
+    - docker run -d --rm --name sc-imaging-container-test shakecast/imaging
+    - sleep 10
+    - docker exec sc-imaging-container-test curl localhost:5000
+    - docker stop sc-imaging-container-test
+
+cleanup:
+  stage: cleanup
+  tags:
+    - dev
+  when: always
+  script:
+    - docker rmi shakecast/imaging
