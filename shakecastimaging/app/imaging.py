@@ -4,23 +4,21 @@ import time
 
 from PIL import Image
 
-from .util import IMAGES_DIR
+from .util import IMAGES_DIR, Config
 
-def get_screenshot(driver, name, div=None):
-    driver.get('http://localhost:5000/render/' + name)
 
-    name = 'screenshot_{}.png'.format(int(time.time() * 100))
-    full_name = os.path.join(IMAGES_DIR, name)
-
+def get_screenshot(driver, name, element_id='screenshot'):
+    config = Config()
+    driver.get('{}:{}/render/{}'.format(config['dns'], config['port'], name))
     time.sleep(5)
-    screenshot_image = get_image(driver)
-    screenshot_image.save(full_name)
+
+    full_name = save_screenshot(driver, name, element_id)
 
     return full_name
 
-def get_image(driver):
+def get_image(driver, element_id):
     # Find the pixel positions of the screenshot element
-    element = driver.find_element_by_id('screenshot')
+    element = driver.find_element_by_id(element_id)
     location = element.location
     size = element.size
     left = location['x']
@@ -33,3 +31,12 @@ def get_image(driver):
     im = Image.open(BytesIO(png))
     im = im.crop((left, top, right, bottom))
     return im
+
+def save_screenshot(driver, name, element_id):
+    name = 'screenshot_{}.png'.format(int(time.time() * 100))
+    full_name = os.path.join(IMAGES_DIR, name)
+
+    screenshot_image = get_image(driver, element_id)
+    screenshot_image.save(full_name)
+
+    return full_name

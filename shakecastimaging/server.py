@@ -7,9 +7,10 @@ from flask import Flask, send_file, request
 
 from app.driver import get_driver
 from app.imaging import get_screenshot
-from app.util import HTML_DIR
+from app.util import HTML_DIR, Config
 
 app = Flask(__name__)
+config = Config()
 driver = get_driver()
 
 @app.route('/')
@@ -55,13 +56,13 @@ def save_html(name, content):
     
     return True
 
-def start(port=5000, debug=False):
+def start(port=config['port'], debug=False):
     app.run(host='0.0.0.0', port=port, debug=debug, threaded=True)
 
 if __name__ == '__main__':
     if len(sys.argv) > 1:
         if sys.argv[1] == '-d':
             # run in debug mode
-            start(port=5000, debug=True)
+            start(port=config['port'], debug=True)
     else:
         start()
