@@ -5,6 +5,7 @@ CWD = os.getcwd()
 IMAGES_DIR = os.path.join(CWD, 'images')
 HTML_DIR = os.path.join(CWD, 'html')
 BASE_DIR = os.path.join(os.path.dirname(__file__), '../')
+TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), '../templates')
 
 class Config(dict):
     def __init__(self):

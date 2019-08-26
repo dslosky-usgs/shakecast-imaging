@@ -3,41 +3,45 @@ import os
 import sys 
 import time
 
-from flask import Flask, send_file, request
+from flask import Flask, send_file, request, render_template_string
 
 from app.driver import get_driver
 from app.imaging import get_screenshot
-from app.util import HTML_DIR, Config
+from app.util import HTML_DIR, Config, TEMPLATE_DIR
+
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 app = Flask(__name__)
 config = Config()
-driver = get_driver()
 
 @app.route('/')
 def root():
     return '<h1>Shakecast Imaging Server</h1>'
 
-@app.route('/screenshot')
-def screenshot():
+@app.route('/screenshot/<template_name>')
+def screenshot(template_name):
     # append all screenshot content
-    content = ''
+    full_template_name = os.path.join(TEMPLATE_DIR, template_name)
 
-    for key in request.args.keys():
-        if content:
-            content = '{}&{}={}'.format(content, key, request.args[key])
-        else:
-            content = request.args[key]
+    if os.path.isfile(full_template_name):
 
-    if content:
+        with open(full_template_name, 'r') as file_:
+            template = file_.read()
+        
         name = 'screenshot_{}.html'.format(int(time.time() * 100))
 
-        if content:
-            save_html(name, content)
-            screenshot = get_screenshot(driver, name)
+        save_html(name, render_template_string(template.decode('utf-8'), **request.args))
 
-            return send_file(screenshot, mimetype='image/gif')
+        driver = get_driver()
+        screenshot = get_screenshot(driver, name)
+        driver.quit()
 
-    return ''
+        return send_file(screenshot, mimetype='image/gif')
+    
+    return '<h1>No Template {}</h1>'.format(template_name)
+
 
 @app.route('/render/<name>')
 def render(name):
