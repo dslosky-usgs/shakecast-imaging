@@ -63,4 +63,4 @@ cleanup:
   script:
     - docker stop sc-imaging-app-test || true
     - docker stop sc-imaging-container-test || true 
-    - docker rmi shakecast/imaging
+    - docker rmi shakecast/imaging || true
