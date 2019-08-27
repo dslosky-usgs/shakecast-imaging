@@ -51,7 +51,6 @@ deploy-prod:
   extends: .docker-connect
   only:
     - tags
-    - master
   script:
     - docker build . -t shakecast/imaging:latest
     - docker push shakecast/imaging
