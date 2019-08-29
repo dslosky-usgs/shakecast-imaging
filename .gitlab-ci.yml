@@ -1,3 +1,8 @@
+variables:
+  APP_TEST_NAME: "sc-imaging-app-test-${CI_COMMIT_SHA}"
+  CONTAINER_TEST_NAME: "sc-imaging-container-test-${CI_COMMIT_SHA}"
+  IMAGE_NAME: "shakecast/imaging:${CI_COMMIT_SHA}"
+
 stages:
   - build
   - test
@@ -17,25 +22,25 @@ container-build:
   tags:
     - dev
   script:
-    - docker build . -t shakecast/imaging
+    - docker build . -t $IMAGE_NAME
 
 app-test:
   stage: test
   tags:
     - dev
   script:
-    - docker run -d --rm --name sc-imaging-app-test shakecast/imaging
+    - docker run -d --rm --name $APP_TEST_NAME $IMAGE_NAME
     - sleep 10
-    - docker exec sc-imaging-app-test python -m shakecastimaging.tests
-  
+    - docker exec $APP_TEST_NAME python -m shakecastimaging.tests
+
 container-test:
   stage: test
   tags:
     - dev
   script:
-    - docker run -d --rm --name sc-imaging-container-test shakecast/imaging
+    - docker run -d --rm --name $CONTAINER_TEST_NAME $IMAGE_NAME
     - sleep 10
-    - docker exec sc-imaging-container-test curl localhost:5000
+    - docker exec $CONTAINER_TEST_NAME curl localhost:5000
 
 publish-dev:
   stage: publish
@@ -45,7 +50,6 @@ publish-dev:
   script:
     - docker build . -t shakecast/imaging:dev
     - docker push shakecast/imaging:dev
-    - docker rmi shakecast/imaging:dev
 
 publish-prod:
   stage: publish
@@ -55,7 +59,6 @@ publish-prod:
   script:
     - docker build . -t shakecast/imaging:latest
     - docker push shakecast/imaging:latest
-    - docker rmi shakecast/imaging:latest
 
 cleanup:
   stage: cleanup
@@ -63,6 +66,8 @@ cleanup:
     - dev
   when: always
   script:
-    - docker stop sc-imaging-app-test || true
-    - docker stop sc-imaging-container-test || true
-    - docker rmi shakecast/imaging || true
+    - docker stop $APP_TEST_NAME || true
+    - docker stop $CONTAINER_TEST_NAME || true
+    - docker rmi $IMAGE_NAME || true
+    - docker rmi shakecast/imaging:dev || true
+    - docker rmi shakecast/imaging:latest || true
