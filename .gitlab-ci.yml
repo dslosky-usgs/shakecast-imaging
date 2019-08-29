@@ -43,6 +43,8 @@ publish-dev:
   extends: .docker-connect
   only:
     - master
+  except:
+    - schedules
   script:
     - docker build . -t shakecast/imaging:dev
     - docker push shakecast/imaging:dev
