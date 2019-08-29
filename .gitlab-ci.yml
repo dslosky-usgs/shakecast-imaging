@@ -1,7 +1,5 @@
 variables:
-  APP_TEST_NAME: "sc-imaging-app-test-${CI_COMMIT_SHA}"
-  CONTAINER_TEST_NAME: "sc-imaging-container-test-${CI_COMMIT_SHA}"
-  IMAGE_NAME: "shakecast/imaging:${CI_COMMIT_SHA}"
+  IMAGE_NAME: "shakecast/imaging:${CI_PIPELINE_ID}"
 
 stages:
   - build
@@ -17,30 +15,28 @@ stages:
   after_script:
     - docker logout
 
-container-build:
-  stage: build
+.build-container:
   tags:
     - dev
-  script:
-    - docker build . -t $IMAGE_NAME
+  before_script:
+    - docker build . -t $IMAGE_NAME-${CI_JOB_ID}
+    - docker run -d --rm --name ${CI_JOB_NAME}-${CI_PIPELINE_ID} $IMAGE_NAME-${CI_JOB_ID}
+    - sleep 10
+  after_script:
+    - docker stop ${CI_JOB_NAME}-${CI_PIPELINE_ID}
+    - docker rmi $IMAGE_NAME-${CI_JOB_ID}
 
 app-test:
   stage: test
-  tags:
-    - dev
+  extends: .build-container
   script:
-    - docker run -d --rm --name $APP_TEST_NAME $IMAGE_NAME
-    - sleep 10
-    - docker exec $APP_TEST_NAME python -m shakecastimaging.tests
+    - docker exec ${CI_JOB_NAME}-${CI_PIPELINE_ID} python -m shakecastimaging.tests
 
 container-test:
   stage: test
-  tags:
-    - dev
+  extends: .build-container
   script:
-    - docker run -d --rm --name $CONTAINER_TEST_NAME $IMAGE_NAME
-    - sleep 10
-    - docker exec $CONTAINER_TEST_NAME curl localhost:5000
+    - docker exec ${CI_JOB_NAME}-${CI_PIPELINE_ID} curl localhost:5000
 
 publish-dev:
   stage: publish
@@ -50,6 +46,8 @@ publish-dev:
   script:
     - docker build . -t shakecast/imaging:dev
     - docker push shakecast/imaging:dev
+  after_script:
+    - docker rmi shakecast/imaging:dev
 
 publish-prod:
   stage: publish
@@ -59,15 +57,5 @@ publish-prod:
   script:
     - docker build . -t shakecast/imaging:latest
     - docker push shakecast/imaging:latest
-
-cleanup:
-  stage: cleanup
-  tags:
-    - dev
-  when: always
-  script:
-    - docker stop $APP_TEST_NAME || true
-    - docker stop $CONTAINER_TEST_NAME || true
-    - docker rmi $IMAGE_NAME || true
-    - docker rmi shakecast/imaging:dev || true
-    - docker rmi shakecast/imaging:latest || true
+  after_script:
+    - docker rmi shakecast/imaging:latest
