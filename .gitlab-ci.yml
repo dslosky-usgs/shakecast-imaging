@@ -1,7 +1,7 @@
 stages:
   - build
   - test
-  - deploy
+  - publish
   - cleanup
 
 .docker-connect:
@@ -37,23 +37,25 @@ container-test:
     - sleep 10
     - docker exec sc-imaging-container-test curl localhost:5000
 
-deploy-dev:
-  stage: deploy
+publish-dev:
+  stage: publish
   extends: .docker-connect
   only:
     - master
   script:
     - docker build . -t shakecast/imaging:dev
     - docker push shakecast/imaging:dev
+    - docker rmi shakecast/imaging:dev
 
-deploy-prod:
-  stage: deploy
+publish-prod:
+  stage: publish
   extends: .docker-connect
   only:
     - tags
   script:
     - docker build . -t shakecast/imaging:latest
-    - docker push shakecast/imaging
+    - docker push shakecast/imaging:latest
+    - docker rmi shakecast/imaging:latest
 
 cleanup:
   stage: cleanup
@@ -62,5 +64,5 @@ cleanup:
   when: always
   script:
     - docker stop sc-imaging-app-test || true
-    - docker stop sc-imaging-container-test || true 
+    - docker stop sc-imaging-container-test || true
     - docker rmi shakecast/imaging || true
