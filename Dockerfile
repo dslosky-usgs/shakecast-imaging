@@ -10,4 +10,4 @@ RUN pip install -r requirements.txt; \
 
 EXPOSE 5000
 
-ENTRYPOINT ["python", "-m", "shakecastimaging.server"]
+ENTRYPOINT ["python", "-m", "shakecastimaging.api"]

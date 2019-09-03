@@ -1,11 +1,9 @@
 import json
 import os
 
-CWD = os.getcwd()
-IMAGES_DIR = os.path.join(CWD, 'images')
-HTML_DIR = os.path.join(CWD, 'html')
-BASE_DIR = os.path.join(os.path.dirname(__file__), '../')
-TEMPLATE_DIR = os.path.join(os.path.dirname(__file__), '../templates')
+APP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
+IMAGES_DIR = os.path.join(APP_DIR, 'images')
+VIEW_DIR = os.path.join(APP_DIR, 'view')
 
 class Config(dict):
     def __init__(self):
@@ -18,7 +16,7 @@ class Config(dict):
 
     @staticmethod
     def open_configs():
-        config_file = os.path.join(BASE_DIR, 'conf.json')
+        config_file = os.path.join(APP_DIR, 'conf.json')
         with open(config_file, 'r') as file_:
             configs = json.loads(file_.read())
         return configs
@@ -26,14 +24,3 @@ class Config(dict):
 def make_images_dir():
     if not os.path.isdir(IMAGES_DIR):
         os.mkdir(IMAGES_DIR)
-
-def make_html_dir():
-    if not os.path.isdir(HTML_DIR):
-        os.mkdir(HTML_DIR)
-
-def get_base_dir():
-    cwd = os.getcwd()
-    os.path.join(cwd, '../')
-
-    return 
-

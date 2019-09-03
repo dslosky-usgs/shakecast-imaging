@@ -7,11 +7,12 @@ from PIL import Image
 from .util import IMAGES_DIR, Config
 
 
-def get_screenshot(driver, name, element_id='screenshot'):
+def get_screenshot(driver, element_id='screenshot'):
     config = Config()
-    driver.get('{}:{}/render/{}'.format(config['dns'], config['port'], name))
+    driver.get('{}:{}/view/impact'.format(config['dns'], config['port']))
     time.sleep(5)
 
+    name = time.time() * 100
     full_name = save_screenshot(driver, name, element_id)
 
     return full_name
