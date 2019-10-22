@@ -29,6 +29,15 @@ def screenshot():
 
     return send_file(screenshot, mimetype='image/gif')
 
+@app.route('/screenshot/impact/<shakemap_id>')
+def screenshot_impact(shakemap_id):
+
+    driver = get_driver()
+    screenshot = get_screenshot(driver)
+    driver.quit()
+
+    return send_file(screenshot, mimetype='image/gif')
+
 # serve angular files
 @app.route('/<path:filename>')
 def view_files(filename):

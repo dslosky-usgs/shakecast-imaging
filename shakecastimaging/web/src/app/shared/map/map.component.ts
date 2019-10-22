@@ -8,6 +8,7 @@ import {
   ViewChild,
   ViewEncapsulation
 } from '@angular/core';
+import { Router } from '@angular/router';
 
 import * as L from 'leaflet';
 
@@ -44,7 +45,7 @@ export class MapComponent implements AfterViewInit {
   layersControl: L.Control.Layers;
   legendControl: L.Control;
   map: L.Map;
-  @ViewChild('mapWrapper', {static: false})
+  @ViewChild('mapWrapper', { static: false })
   mapWrapper: ElementRef;
   mousePositionControl: L.Control;
   // overlays currently part of the layers control
@@ -56,7 +57,7 @@ export class MapComponent implements AfterViewInit {
   showAttributionControl = true;
   zoomControl: L.Control.Zoom;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, private router: Router) {}
 
   /**
    * Get the overlay bounds
@@ -442,6 +443,9 @@ export class MapComponent implements AfterViewInit {
     overlays.forEach(overlay => {
       if (overlay.hasOwnProperty('httpClient')) {
         overlay.httpClient = this.httpClient;
+      }
+      if (overlay.hasOwnProperty('router')) {
+        overlay.router = this.router;
       }
       if (!this.overlaysAdded.includes(overlay)) {
         this.overlaysAdded.push(overlay);

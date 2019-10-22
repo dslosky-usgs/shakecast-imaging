@@ -4,12 +4,14 @@ import { HttpClientModule } from '@angular/common/http';
 
 
 import { MapComponent } from './map/map.component';
+import { ImpactOverlaysPipe } from './impact-overlays.pipe';
 
 
 @NgModule({
-  declarations: [MapComponent],
+  declarations: [MapComponent, ImpactOverlaysPipe],
   exports: [
-    MapComponent
+    MapComponent,
+    ImpactOverlaysPipe
   ],
   imports: [
     CommonModule,
