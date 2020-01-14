@@ -7,9 +7,8 @@ from PIL import Image
 from .util import IMAGES_DIR, Config
 
 
-def get_screenshot(driver, element_id='screenshot'):
-    config = Config()
-    driver.get('{}:{}/view/impact'.format(config['dns'], config['port']))
+def get_screenshot(driver, file_name, element_id='map'):
+    driver.get('file:///{}'.format(file_name))
     time.sleep(5)
 
     name = time.time() * 100

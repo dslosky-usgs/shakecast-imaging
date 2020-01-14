@@ -6,5 +6,4 @@ def get_driver():
     options = Options()
     options.headless = True
     driver = webdriver.Firefox(options=options)
-
     return driver

@@ -22,23 +22,18 @@ def root():
 
 @app.route('/screenshot')
 def screenshot():
+    file_path = request.args.get('file_path', None)
+    element_id = request.args.get('element_id', 'html')
+
+    if file_path is None:
+        return '<h1>No file specified</h1>'
 
     driver = get_driver()
-    screenshot = get_screenshot(driver)
+    screenshot = get_screenshot(driver, file_path, element_id)
     driver.quit()
 
     return send_file(screenshot, mimetype='image/gif')
 
-# serve angular files
-@app.route('/<path:filename>')
-def view_files(filename):
-    return send_from_directory(VIEW_DIR, filename)
-
-@app.route('/view/<path>')
-def test(path):
-    index = os.path.join(VIEW_DIR, 'index.html')
-    with open(index, 'r') as file_:
-        return file_.read()
 
 def start(port=config['port'], debug=False):
     app.run(host='0.0.0.0', port=port, debug=debug, threaded=True)
