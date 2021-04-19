@@ -5,9 +5,9 @@ import time
 
 from flask import Flask, send_file, request
 
-from app.driver import get_driver
-from app.imaging import get_screenshot
-from app.util import HTML_DIR
+from .app.driver import get_driver
+from .app.imaging import get_screenshot
+from .app.util import HTML_DIR
 
 app = Flask(__name__)
 driver = get_driver()
@@ -21,7 +21,7 @@ def screenshot():
     # append all screenshot content
     content = ''
 
-    for key in request.args.keys():
+    for key in list(request.args.keys()):
         if content:
             content = '{}&{}={}'.format(content, key, request.args[key])
         else:
