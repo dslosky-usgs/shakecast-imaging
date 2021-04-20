@@ -20,8 +20,9 @@ COPY scripts ./scripts
 RUN find ./scripts -type f -iname "*.sh" -exec chmod +x {} \;
 
 # Install gecko driver and firefox
-RUN ./scripts/gecko-install.sh; \
-    yum install firefox -y;
+COPY geckodriver /usr/local/bin
+RUN chmod +x /usr/local/bin/geckodriver
+RUN yum install firefox -y;
 
 COPY requirements.txt .
 

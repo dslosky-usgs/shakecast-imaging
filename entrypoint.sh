@@ -4,7 +4,7 @@
 USER_ID=${SHAKECAST_USER_ID:-0}
 
 # Run any arguments directly
-if [ $@ ];
+if [ $# -gt 0 ];
 then
   exec "$@"
 
@@ -18,7 +18,7 @@ then
   id -u shakecast &>/dev/null || useradd -u $USER_ID -o shakecast;
   chown -R shakecast:shakecast .;
 
-    exec /usr/local/bin/gosu shakecast python3 -m shakecastimaging.server;
+exec /usr/local/bin/gosu shakecast python3 -m shakecastimaging.server;
   exit 0;
 fi
 
@@ -34,4 +34,4 @@ export SHAKECAST_USER_ID=\${UID}
 **************************************************************************
 ";
 
-exec /usr/local/bin/gosu shakecast python3 -m shakecastimaging.server;
+exec python3 -m shakecastimaging.server;
